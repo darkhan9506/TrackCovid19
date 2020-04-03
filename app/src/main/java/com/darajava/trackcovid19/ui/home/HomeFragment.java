@@ -22,7 +22,6 @@ import com.darajava.trackcovid19.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.ref.ReferenceQueue;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 

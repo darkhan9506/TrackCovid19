@@ -4,20 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-<<<<<<< HEAD
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-=======
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.SearchView;
->>>>>>> Adding Filter to Country in RecyclerView with SearchView.
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -38,43 +33,29 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-<<<<<<< HEAD
-=======
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
->>>>>>> Adding Filter to Country in RecyclerView with SearchView.
 
 public class CountryFragment extends Fragment {
 
     RecyclerView rvCovidCountry;
     ProgressBar progressBar;
-<<<<<<< HEAD
-    TextView tvTotalCountry;
-
-    private static final String TAG = CountryFragment.class.getSimpleName();
-    ArrayList<CovidCountry> covidCountries;
-=======
     CovidCountryAdapter covidCountryAdapter;
 
     private static final String TAG = CountryFragment.class.getSimpleName();
     List<CovidCountry> covidCountries;
->>>>>>> Adding Filter to Country in RecyclerView with SearchView.
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-
         View root = inflater.inflate(R.layout.fragment_country, container, false);
 
-<<<<<<< HEAD
-        // call view
-        rvCovidCountry = root.findViewById(R.id.rvCovidCountry);
-        tvTotalCountry = root.findViewById(R.id.tvTotalCountries);
-=======
-        // set Has option menu as true because we have menu
+        // set has option menu as true because we have menu
         setHasOptionsMenu(true);
 
         // call view
         rvCovidCountry = root.findViewById(R.id.rvCovidCountry);
->>>>>>> Adding Filter to Country in RecyclerView with SearchView.
         progressBar = root.findViewById(R.id.progress_circular_country);
         rvCovidCountry.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -82,24 +63,17 @@ public class CountryFragment extends Fragment {
         dividerItemDecoration.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.line_divider));
         rvCovidCountry.addItemDecoration(dividerItemDecoration);
 
-<<<<<<< HEAD
-=======
-        // call list
+        //call list
         covidCountries = new ArrayList<>();
 
->>>>>>> Adding Filter to Country in RecyclerView with SearchView.
         // call Volley method
-        getDataFromServer();
+        getDataFromServerSortTotalCases();
 
         return root;
     }
 
     private void showRecyclerView() {
-<<<<<<< HEAD
-        CovidCountryAdapter covidCountryAdapter = new CovidCountryAdapter(covidCountries, getActivity());
-=======
         covidCountryAdapter = new CovidCountryAdapter(covidCountries, getActivity());
->>>>>>> Adding Filter to Country in RecyclerView with SearchView.
         rvCovidCountry.setAdapter(covidCountryAdapter);
 
         ItemClickSupport.addTo(rvCovidCountry).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
@@ -116,13 +90,9 @@ public class CountryFragment extends Fragment {
         startActivity(covidCountryDetail);
     }
 
-    private void getDataFromServer() {
-        String url = "https://corona.lmao.ninja/countries";
-
-<<<<<<< HEAD
+    private void getDataFromServerSortTotalCases() {
+        String url = "https://corona.lmao.ninja/v2/countries";
         covidCountries = new ArrayList<>();
-=======
->>>>>>> Adding Filter to Country in RecyclerView with SearchView.
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
@@ -136,27 +106,32 @@ public class CountryFragment extends Fragment {
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject data = jsonArray.getJSONObject(i);
 
-<<<<<<< HEAD
-                            // Extract JSONPbject inside JSONObject
-=======
                             // Extract JSONObject inside JSONObject
->>>>>>> Adding Filter to Country in RecyclerView with SearchView.
                             JSONObject countryInfo = data.getJSONObject("countryInfo");
 
-                            covidCountries.add(new CovidCountry(data.getString("country"), data.getString("cases"),
+                            covidCountries.add(new CovidCountry(
+                                    data.getString("country"), data.getInt("cases"),
                                     data.getString("todayCases"), data.getString("deaths"),
                                     data.getString("todayDeaths"), data.getString("recovered"),
                                     data.getString("active"), data.getString("critical"),
                                     countryInfo.getString("flag")));
                         }
-<<<<<<< HEAD
-                        tvTotalCountry.setText(jsonArray.length() + " countries");
-=======
+
+                        // sort descending
+                        Collections.sort(covidCountries, new Comparator<CovidCountry>() {
+                            @Override
+                            public int compare(CovidCountry o1, CovidCountry o2) {
+                                if (o1.getmCases() > o2.getmCases()) {
+                                    return -1;
+                                } else {
+                                    return 1;
+                                }
+                            }
+                        });
 
                         // Action Bar Title
                         getActivity().setTitle(jsonArray.length()+ " countries");
 
->>>>>>> Adding Filter to Country in RecyclerView with SearchView.
                         showRecyclerView();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -173,12 +148,56 @@ public class CountryFragment extends Fragment {
                 });
         Volley.newRequestQueue(getActivity()).add(stringRequest);
     }
-<<<<<<< HEAD
-=======
 
+    private void getDataFromServerSortAlphabet() {
+        String url = "https://corona.lmao.ninja/v2/countries";
+        covidCountries = new ArrayList<>();
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                progressBar.setVisibility(View.GONE);
+
+                if (response != null) {
+                    Log.e(TAG, "onResponse: " + response);
+                    try {
+                        JSONArray jsonArray = new JSONArray(response);
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject data = jsonArray.getJSONObject(i);
+
+                            // Extract JSONObject inside JSONObject
+                            JSONObject countryInfo = data.getJSONObject("countryInfo");
+
+                            covidCountries.add(new CovidCountry(
+                                    data.getString("country"), data.getInt("cases"),
+                                    data.getString("todayCases"), data.getString("deaths"),
+                                    data.getString("todayDeaths"), data.getString("recovered"),
+                                    data.getString("active"), data.getString("critical"),
+                                    countryInfo.getString("flag")));
+                        }
+
+                        // Action Bar Title
+                        getActivity().setTitle(jsonArray.length()+ " countries");
+
+                        showRecyclerView();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressBar.setVisibility(View.GONE);
+                        Log.e(TAG, "onResponse: " + error);
+                    }
+                });
+        Volley.newRequestQueue(getActivity()).add(stringRequest);
+    }
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.search_menu, menu);
+        inflater.inflate(R.menu.country_menu, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = new SearchView(getActivity());
         searchView.setQueryHint("Search...");
@@ -201,5 +220,24 @@ public class CountryFragment extends Fragment {
         searchItem.setActionView(searchView);
         super.onCreateOptionsMenu(menu, inflater);
     }
->>>>>>> Adding Filter to Country in RecyclerView with SearchView.
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_sort_alpha:
+                Toast.makeText(getContext(), "Sort Alphabetically", Toast.LENGTH_SHORT).show();
+                covidCountries.clear();
+                progressBar.setVisibility(View.VISIBLE);
+                getDataFromServerSortAlphabet();
+                return true;
+            case R.id.action_sort_cases:
+                Toast.makeText(getContext(), "Sort by Total Cases", Toast.LENGTH_SHORT).show();
+                covidCountries.clear();
+                progressBar.setVisibility(View.VISIBLE);
+                getDataFromServerSortTotalCases();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }
